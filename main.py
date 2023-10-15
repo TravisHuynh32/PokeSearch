@@ -2,6 +2,7 @@ from pokebase import move
 import webbrowser
 
 # basic Pokemon Move Finder Program
+# Created by: Travis Huynh
 
 def fetch_pokemon_id(name):
     poke = move(name) 
