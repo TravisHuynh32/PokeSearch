@@ -1,83 +1,112 @@
 from pokebase import move
-import webbrowser
+from tkinter import *
+import requests
+from PIL import Image, ImageTk
 
 # basic Pokemon Move Finder Program
 # Created by: Travis Huynh
-
-def fetch_pokemon_id(name):
-    poke = move(name) 
-    print("Summary:")
-    print("-------------------------------------------------------------------------------------------------------")
-    print("The " + str(poke.type) + " type move " + name + " is a " + str(poke.damage_class) + " type move that has an id of: " + str(poke.id))
-    print("This move was first introduced in " + str(poke.generation))
-    print("")
-
+# Using Python GUI for interactive user experience! 
 
 def fetch_all_pokemon_move(name): 
     poke = move(name)
-    print("List of Pokemon that can aquire this move!")
-    print("-------------------------------------------------------------------------------------------------------")
-    print(*poke.learned_by_pokemon, sep = ", ")
-    print("")
+    result = "List of Pokemon that can acquire this move!\n"
+    result += "-------------------------------------------------------------------------------------------\n"
+    result += ", ".join(pokemon.name for pokemon in poke.learned_by_pokemon) + "\n"
+    return result
 
+def fetch_pokemon_id(name):
+    poke = move(name)
+    result = "Summary:\n"
+    result += "-------------------------------------------------------------------------------------------\n"
+    result += f"The {poke.type} type move {name} is a {poke.damage_class} type move that has an id of: {poke.id}\n"
+    result += f"This move was first introduced in {poke.generation}\n\n"
+    return result
 
 def fetch_pokemon_power(name):
-    poke = move(name) 
-    print("Combat:")
-    print("-------------------------------------------------------------------------------------------------------")
+    poke = move(name)
+    result = "Combat:\n"
+    result += "-------------------------------------------------------------------------------------------\n"
     if poke.power < 100: 
-        print(name + " has " + str(poke.power) + " power" + " and has " + str(poke.pp) + " pp")
-        print("The power on this move is less than 100, wow so shit haha!")
-        print("Additionally, this move has an accuracy of " + str(poke.accuracy))
-        print("")
+        result += f"{name} has {poke.power} power and has {poke.pp} pp\n"
+        result += "The power on this move is less than 100, wow so shit haha!\n"
+        result += f"Additionally, this move has an accuracy of {poke.accuracy}\n\n"
         compare_eq = (poke.power / 100) * 100
-        print(name + " is " + str(compare_eq) + "% of Earthquake(ID: 84) in comparison to its power (because earthquake is op)")
+        result += f"{name} is {compare_eq}% of Earthquake(ID: 84) in comparison to its power (because earthquake is op)\n"
     elif poke.power == 100: 
-        print(name + " has " + str(poke.power) + " power" + " and has " + str(poke.pp) + " pp")
-        print("WOW! I have much respect for this move! It has power that has the same power as earthquake OMG!!!")
-        print("Additionally, this move has an accuracy of " + str(poke.accuracy))
-        print("")
+        result += f"{name} has {poke.power} power and has {poke.pp} pp\n"
+        result += "WOW! I have much respect for this move! It has power that has the same power as earthquake OMG!!!\n"
+        result += f"Additionally, this move has an accuracy of {poke.accuracy}\n\n"
         compare_eq = (poke.power / 100) * 100
-        print(name + " is " + str(compare_eq) + "% of Earthquake(ID: 84) in comparison to its power (because earthquake is op)")
+        result += f"{name} is {compare_eq}% of Earthquake(ID: 84) in comparison to its power (because earthquake is op)\n"
     else: 
-        print(name + " has " + str(poke.power) + " power" + " and has " + str(poke.pp) + " pp")
-        print("Bruh, ain't no way its better than stab eq, how does it have more power :( ")
-        print("Additionally, this move has an accuracy of " + str(poke.accuracy))
-        print("")
+        result += f"{name} has {poke.power} power and has {poke.pp} pp\n"
+        result += "Bruh, ain't no way its better than stab eq, how does it have more power :(\n"
+        result += f"Additionally, this move has an accuracy of {poke.accuracy}\n\n"
         compare_eq = (poke.power / 100) * 100
-        print(name + " is " + str(compare_eq) + "% of Earthquake(ID: 84) in comparison to its power (because earthquake is op)")
-    print("-------------------------------------------------------------------------------------------------------")
-    print("")
+        result += f"{name} is {compare_eq}% of Earthquake(ID: 84) in comparison to its power (because earthquake is op)\n"
+    result += "-------------------------------------------------------------------------------------------\n\n"
+    return result
 
-def fetch_move_info(name):
-    print("Fetching " + name + ".......\n")
-    fetch_all_pokemon_move(name)
-    fetch_pokemon_id(name)
-    fetch_pokemon_power(name)
+def fetch_move_info_gui(name):
+    output_text.delete(1.0, END) 
 
-def main(): 
-    print("Create by: Travis Huynh\n")
-    print("Hello! Welcome to my program that allows you to search information about a specific move in Pokemon!")
-    print("This program will tell you the about the specifics about each move!")
-    print("It will allow you to learn how much power it has, to how weak it is compared to Earthquake! (because I love earthquake :)")
-    print("What type of move do you want to learn about in Pokemon?")
-    print("-------------------------------------------------------------------------------------------------------")
+    try:
+        poke = move(name)
+    except Exception as e:
+        output_text.insert(END, f"Error: {e}")
+        return
 
-    while True:
-        name = input()
+    # Fetch move details
+    output_text.insert(END, "Fetching " + name + ".......\n\n")
+    output_text.insert(END, fetch_all_pokemon_move(name))
+    output_text.insert(END, fetch_pokemon_id(name))
+    output_text.insert(END, fetch_pokemon_power(name))
 
-        if name == "":
-            print("Ok! You don't care anymore! bye!")
-            print("Please rerun the program again if you want to know more!")
-            print("")
-            break
+    # Display move image
+    try:
+        sprite = Image.open(f"icons/{name.lower()}.png")
+        sprite = sprite.resize((100, 100))
+        sprite = ImageTk.PhotoImage(sprite)
+        sprite_label.config(image=sprite)
+        sprite_label.image = sprite
+    except Exception as e:
+        sprite_label.config(image=None)
+        print(f"Error loading sprite: {e}")
 
-        fetch_move_info(name)
+def main_gui():
+    global root 
+    root = Tk()
+    root.title("Pokemon Move Finder")
 
-        print("")
-        print("Would you like to learn more about a specific pokemon move? Or You can enter nothing to exit this program!")
-        print("")
-        print("-------------------------------------------------------------------------------------------------------")
+    label = Label(root, text="Welcome to Pokemon Move Finder!\n Created by: Travis Huynh", font=("Arial", 16))
+    label.pack(pady=10)
+
+    entry = Entry(root, font=("Arial", 12), width=30)
+    entry.pack(pady=10)
+
+    def search_move():
+        name = entry.get()
+        if name:
+            fetch_move_info_gui(name)
+
+    button = Button(root, text="Search Move", command=search_move, font=("Arial", 12))
+    button.pack(pady=10)
+
+    global output_text
+    output_text = Text(root, wrap=WORD, width=50, height=20, font=("Arial", 12))
+    output_text.pack(pady=10)
+
+    global sprite_label
+    sprite_label = Label(root)
+    sprite_label.pack(pady=10)
+
+    custom_font = ("Helvetica", 14)
+    label.configure(font=custom_font)
+    entry.configure(font=custom_font)
+    button.configure(font=custom_font)
+    output_text.configure(font=custom_font)
+
+    root.mainloop()
 
 if __name__ == '__main__':
-    main()
+    main_gui()
