@@ -1,9 +1,10 @@
-from pokebase import move
+from pokebase import move, ability
 from tkinter import *
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 import requests
 import os
 from PIL import Image, ImageTk
+from tkinter.simpledialog import askstring
 
 # basic Pokemon Move Finder Program
 # Created by: Travis Huynh
@@ -67,6 +68,33 @@ def fetch_pokemon_power(name):
     result += "-------------------------------------------------------------------------------------------\n\n"
     return result
 
+def fetch_ability_info(name):
+    try:
+        ability_data = ability(name)
+        result = f"Ability Name: {ability_data.name}\n"
+        result += f"Effect: {ability_data.effect}\n"
+        result += f"Short Effect: {ability_data.short_effect}\n"
+        return result
+    except Exception as e:
+        return f"Error fetching information: {e}"
+    
+def fetch_type_effectiveness(move_name, target_type):
+    try:
+        move_data = move(move_name)
+        effectiveness = 1.0
+        for target in move_data.type.damage_relations.double_damage_to:
+            if target.name == target_type:
+                effectiveness *= 2.0
+        for target in move_data.type.damage_relations.half_damage_to:
+            if target.name == target_type:
+                effectiveness *= 0.5
+        for target in move_data.type.damage_relations.no_damage_to:
+            if target.name == target_type:
+                effectiveness = 0.0
+        return f"The effectiveness of {move_name} against {target_type} type is {effectiveness}.\n"
+    except Exception as e:
+        return f"Error fetching information: {e}"
+
 def fetch_move_info_gui(name):
     output_text.delete(1.0, END) 
 
@@ -88,9 +116,9 @@ def main_gui():
     global root
     root = Tk()
     root.title("Pokemon Move Finder")
-    root.configure(bg="#add8e6")  # Set the background color to light blue
+    root.configure(bg="#FC9C85")  
 
-    label = Label(root, text="Welcome to Pokemon Move Finder!\n Created By: Travis Huynh", font=("Calibri", 16), bg="#add8e6")
+    label = Label(root, text="Welcome to Pokemon Move Finder!\n Created By: Travis Huynh", font=("Calibri", 16), bg="#FCBBAB")
     label.pack(pady=10)
 
     entry = Entry(root, font=("Calibri", 12), width=30)
@@ -106,6 +134,12 @@ def main_gui():
 
     clear_button = Button(root, text="Clear Output", command=clear_output, font=("Calibri", 12), bg="#ffffff")
     clear_button.pack(pady=10)
+    
+    ability_button = Button(root, text="Search Ability (does not work lol)", command=search_ability, font=("Calibri", 12), bg="#ffffff")
+    ability_button.pack(pady=10)
+
+    type_effectiveness_button = Button(root, text="Type Effectiveness Checker", command=lambda: type_effectiveness_check(entry), font=("Calibri", 12), bg="#ffffff")
+    type_effectiveness_button.pack(pady=10)
 
     global output_text
     output_text = Text(root, wrap=WORD, width=50, height=20, font=("Calibri", 12))
@@ -116,9 +150,24 @@ def main_gui():
     entry.configure(font=custom_font)
     button.configure(font=custom_font)
     clear_button.configure(font=custom_font)
+    type_effectiveness_button.configure(font=custom_font)
+    ability_button.configure(font=custom_font)
     output_text.configure(font=custom_font)
 
     root.mainloop()
+
+def search_ability():
+    ability_name = askstring("Search Ability", "Enter ability name:")
+    if ability_name:
+        output_text.delete(1.0, END)
+        output_text.insert(END, fetch_ability_info(ability_name))
+
+def type_effectiveness_check(entry):
+    move_name = entry.get()
+    target_type = askstring("Type Effectiveness Checker", "Enter target Pokémon type:")
+    if move_name and target_type:
+        output_text.delete(1.0, END)
+        output_text.insert(END, fetch_type_effectiveness(move_name, target_type))
 
 if __name__ == '__main__':
     main_gui()
