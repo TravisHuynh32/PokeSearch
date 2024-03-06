@@ -22,14 +22,3 @@ This project aims to provide a tool for Pokemon fans to find information about m
     ```bash
     npm start
     ```
-
-## Usage
-1. Open the application in your web browser.
-2. Use the search bar to search for moves by name or type.
-3. Click on a move to view its details.
-
-## Technologies Used
-- HTML
-- CSS
-- JavaScript
-- PokeAPI
