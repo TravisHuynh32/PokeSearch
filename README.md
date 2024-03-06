@@ -1,5 +1,7 @@
 # Pokemon Move Finder - PokeAPI
 
+![Pikachu](https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png)
+
 ## Overview
 This project aims to provide a tool for Pokemon fans to find information about moves using the PokeAPI. It allows users to search for moves by name or type and retrieve details such as power, accuracy, and effect.
 
