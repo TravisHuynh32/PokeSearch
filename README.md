@@ -24,8 +24,13 @@ This project aims to provide a tool for Pokemon fans to find information about m
     ```bash
     npm start
     ```
+
 ## Created By
 - Travis Huynh
 
 ## Completion Date
 - October 2023
+
+## Updates and Improvements
+- Currently updating and customizing the GUI to achieve a more modern and professional look
+
